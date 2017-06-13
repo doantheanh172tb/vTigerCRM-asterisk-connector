@@ -1,0 +1,24 @@
+{
+  "name": "vtigercrm-asterisk-connector",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon server/server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/doantheanh172tb/vTigerCRM-asterisk-connector.git"
+  },
+  "author": "Doan The Anh, doantheanh172tb@gmail.com, +84964225162",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/doantheanh172tb/vTigerCRM-asterisk-connector/issues"
+  },
+  "homepage": "https://github.com/doantheanh172tb/vTigerCRM-asterisk-connector#readme",
+  "dependencies": {
+    "ejs": "^2.5.6",
+    "express": "^4.15.3"
+  }
+}

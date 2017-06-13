@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Danh sách Call Center</title>
+</head>
+
+<body>
+    <h1>Danh sách Call Centers</h1>
+    <p>Click vào tên Call Center để đến trang quản lý Call Center đó.</p>
+    <ul>
+        <% companyList.forEach(function(company) { %>
+            <li>
+                <a href="/<%= company %>"><%= company %></a>
+            </li>
+        <% }); %>
+    </ul>
+</body>
+
+</html>
