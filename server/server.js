@@ -2,12 +2,15 @@ const path = require('path');
 const express = require('express');
 const http = require('http');
 
+const createWebSocket = require('./webSocket/index.js');
 const configPBXservers = require('../config.js').configPBXservers;
 
 var app = express();
 //tao 1 express server
 var server = http.createServer(app);
-//set view engine
+// tao 1 socket server
+createWebSocket(server);
+// set view engine
 app.set('view engine', 'ejs');
 
 //danh sach cac Namespace
