@@ -2,6 +2,7 @@ const socketIO = require('socket.io');
 const { configPBXservers, connectorURL } = require('../../config.js');
 const aio = require('asterisk.io');
 const vtws = require('node-vtiger');
+const createStream = require('./IOstream.js');
 
 function createWebSocket(server) {
     //create io object
@@ -107,7 +108,7 @@ function createWebSocket(server) {
                     //check Login CRM
                     vt_client.doLogin((loginErr) => {
                         if (loginErr) {
-                            console.log('Error> doLogin', JSON.stringify(loginErr));
+                            console.log('Error> doLogin(eventAny)', JSON.stringify(loginErr));
                         } else {
                             let query = "SELECT id, phone_crm_extension FROM Users  WHERE  phone_crm_extension='" + phone_extension + "'";
 
@@ -154,9 +155,9 @@ function createWebSocket(server) {
                                                         //create new pbx record
                                                         vt_client.doCreate('PBXManager', pbx_data, ((pbxErr, pbxResult) => {
                                                             if (pbxErr) {
-                                                                console.log('Error > insert pbxmanager:: ', JSON.stringify(pbxErr));
+                                                                console.log('!!!!!!!!!!!!!!Error > insert pbxmanager:: ', JSON.stringify(pbxErr));
                                                             } else {
-                                                                console.log('Successed > insert pbxmanager:: ', JSON.stringify(pbxResult));
+                                                                console.log('!!!!!!!!!Successed > insert pbxmanager:: ', JSON.stringify(pbxResult));
                                                             }
                                                         }));
                                                 }
@@ -171,8 +172,76 @@ function createWebSocket(server) {
                             });
                         }
                     });
-                } else {
+                } else if (data.Event == 'End MixMonitorCall') {
+                    console.log('End MixMonitorCall-------------------');
+                    console.log(data);
+                    var source = data['Source Number'];
+                    var destination = data['Destination Number'];
+                    var dirArr = data.File.split('/');
+                    var filenameArr = dirArr[5].split('-');
+                    var dateString = filenameArr[0];
+                    let typeCall = filenameArr[1];
 
+                    if (typeCall == 'Outbound' || typeCall == 'Inbound') {
+                        //function update pbxmanager (recordingurl)
+                        function doSaveRecord(params) {
+
+                            //check Login CRM
+                            vt_client.doLogin((loginErr) => {
+                                if (loginErr) {
+                                    console.log('Error> doLogin', JSON.stringify(loginErr));
+                                } else {
+                                    var mixMonitorTime =
+                                        params.dateString.substr(0, 4) + "-" +
+                                        params.dateString.substr(4, 2) + "-" +
+                                        params.dateString.substr(6, 2) + " " +
+                                        params.dateString.substr(8, 2) + ":" +
+                                        params.dateString.substr(10, 2) + ":" +
+                                        params.dateString.substr(12, 2);
+
+                                    // console.log('11111111111111111111111111111111', mixMonitorTime);
+                                    let customernumber = "";
+                                    if (typeCall == 'Outbound') {
+                                        customernumber = params.destination;
+                                    } else {
+                                        customernumber = params.source;
+                                    }
+                                    let pbxQuery = "SELECT * FROM PBXManager WHERE endtime >='" + mixMonitorTime + "'"
+                                        + " AND customernumber = '" + customernumber + "'";
+
+                                    // //get pbx
+                                    vt_client.doQuery(pbxQuery, (pbxErr, pbxResult) => {
+                                        if (pbxErr) {
+                                            console.log('Error> doQueryPBXmanagerID', JSON.stringify(pbxErr));
+                                        } else {
+                                            console.log('Successed> doQueryPBXmanagerID', JSON.stringify(pbxResult));
+                                            if (pbxResult.length > 0) {
+                                                let updatePBXRecord = pbxResult[0];
+                                                updatePBXRecord.recordingurl = dirArr[4] + '/' + dirArr[5];
+                                                //doUpdate pbx
+                                                vt_client.doUpdate(updatePBXRecord, (updatePBXErr, updatePBXResult) => {
+                                                    if (updatePBXErr) {
+                                                        console.log('Error> doQueryPBXmanagerID', JSON.stringify(updatePBXErr));
+                                                    } else {
+                                                        console.log('Successed> doQueryPBXmanagerID', JSON.stringify(updatePBXResult));
+                                                    }
+                                                })
+                                            }
+                                        }
+                                    })
+                                }
+                            })
+                        };
+
+                        var asyncSaveRecord = (params, callback) => {
+                            setTimeout(() => {
+                                callback(params);
+                            }, 10000);
+                        };
+
+                        //function run asyncSaveRecord wait 10s
+                        asyncSaveRecord({ dateString: dateString, destination: destination, source: source }, doSaveRecord);
+                    }
                 }
             });
         });
