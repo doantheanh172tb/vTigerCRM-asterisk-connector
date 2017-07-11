@@ -217,7 +217,7 @@ function createWebSocket(server) {
                                             console.log('Successed> doQueryPBXmanagerID', JSON.stringify(pbxResult));
                                             if (pbxResult.length > 0) {
                                                 let updatePBXRecord = pbxResult[0];
-                                                updatePBXRecord.recordingurl = dirArr[4] + '/' + dirArr[5];
+                                                updatePBXRecord.recordingurl = connectorURL + '/' + AMI.namespace + '/' + dirArr[4] + '/' + dirArr[5];
                                                 //doUpdate pbx
                                                 vt_client.doUpdate(updatePBXRecord, (updatePBXErr, updatePBXResult) => {
                                                     if (updatePBXErr) {
