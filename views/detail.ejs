@@ -7,6 +7,27 @@
 
 <body>
     <p>Detail: <%= namespace %></p>
+    <audio id='player' controls>
+        <source id='playersource' src="" type="audio/wav">
+    </audio>
+    <h1>Trang quản lý Call Center của <%= namespace %></h1>
+    <input id="namespace" type="hidden" value="<%= namespace %>"/>
+    <p>Câu lệnh: <br/>
+        call [from] [to]: Tạo cuộc gọi từ số [from] đến số [to].<br/>
+        filter content [content]: Chỉ hiện những log có chứa nội dung [content]. (Nếu filter event tồn tại thì thêm điều kiện event = [event])<br/>
+        filter event [event]: Chỉ hiện những log có event là [event]. (Nếu filter content tồn tại thì thêm điều kiện content = [content])<br/>
+        filter reset: Cài đặt lại tất cả filters. <br/>
+        clear: Dọn dẹp nội dung trên terminal
+    </p>
+    <h3>Kết quả từ terminal</h3>
+    <div id="resultFrame" style="border:1px solid black; min-width: 300px; height: 300px; max-width: 1000px; overflow-x: auto">
+        <div id='result'>
+           
+        </div>
+    <div>
+    <input id="command" type="text" style="border: 0; width: 100%;"/>
+    <script src='/socket.io/socket.io.js'></script>
+    <script src='/js/script.js'></script>
 </body>
 
 </html>
